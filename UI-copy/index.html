@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Page Title</title>
+  <meta charset="UTF-8"/>
+  <link rel="stylesheet" href="rock-paper-scissors.css">
+</head>
+<body>
+
+<div class = "buttons">
+        <button class = 'game' id = '1' class = "offset">ROCK</button>
+        <button class = 'game' id = '2'>PAPER</button>
+        <button class = 'game' id = '3' class = "offset">SCISSORS</button>
+</div>
+
+<div class = "greeting">Try your luck!</div>
+
+<div class = "buttons">
+    <button id = '4' class = "continue"></button>
+</div>
+
+<style>
+
+    body {
+        font-size: larger;
+        font-family: cursive;
+        background-color: #CCC;
+    }
+
+    .continue {
+        display: block;
+        box-shadow: 5px 5px 5px #888;
+        border-style: hidden;
+        font-family: fantasy;
+        height: 2.5em;
+        width: 10em;
+    }
+
+    button.game {
+        width: 250px;
+        margin: 0 30px;
+        height: 170px;
+        box-shadow: 5px 5px 5px #888;
+        border-style: hidden;
+        transition: 0.1s;
+        font-family: fantasy;
+    }
+
+    button.click {
+        border: 5px solid red;
+        box-shadow: inset 5px 0px 5px #888;
+    }
+
+    button.offset {
+        align-self: flex-end;
+    }
+
+    div.buttons {
+        display: flex;
+        justify-content: space-around;
+        margin-top: 10vh;
+        height: 250px;
+        min-width: 60em;
+    }
+
+    div.greeting {
+        background-color: red;
+        text-align: center;
+        margin-top: 10vh;
+        padding: 20px 0px;
+        min-width: 60em;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+</style>
+
+
+
+<script>
+
+//THIS RANDOMIZES THE COMPUTER'S SELECTION
+let computerPlay = function() {
+    randomNumber = Math.floor(Math.random() * 3);
+    switch (randomNumber) {
+        case 0:
+        return "rock";
+        break;
+        case 1:
+        return "paper";
+        break;
+        case 2:
+        return "scissors";
+        break;
+    }
+}
+
+//THESE ARE ALL THE GAME FUNCTIONS
+function playRound(playerSelection) {
+    computerSelection = computerPlay();
+    message.textContent = `You played ${playerSelection}. The computer played ${computerSelection}.`;
+    continueButton.classList.remove('hidden');
+    continueButton.textContent = "continue";
+    toggleButtonVisibility();
+}
+
+function roundResults() { 
+    if (playerSelection == "rock") {
+        if (computerSelection == "scissors") {
+            greeting.textContent = "You Win the Round! Rock beats Scissors";
+            playerScore += 1;
+        }
+        else if (computerSelection == "paper") {
+            greeting.textContent = "You Lose the Round! Paper beats Rock";
+            computerScore += 1;
+        }
+        else {
+            greeting.textContent = "You Tied!";
+        }
+    }
+    else if (playerSelection == "paper") {
+        if (computerSelection == "rock") {
+            message.textContent = "You Win the Round! Paper beats Rock";
+            playerScore += 1;
+        }
+        else if (computerSelection == "scissors") {
+            message.textContent = "You Lose the Round! Scissors beats Paper";
+            computerScore +=1;
+        }
+        else {
+            message.textContent = "You Tied!";
+        }
+    }
+    else if (playerSelection == "scissors") {
+        if (computerSelection == "paper") {
+            message.textContent = "You Win the Round! Scissors beats Paper";
+            playerScore += 1;
+        }
+        else if (computerSelection == "rock") {
+            message.textContent = "You Lose the Round! Rock beats Scissors";
+            computerScore += 1;
+        }
+        else {
+            message.textContent = "You Tied!";
+        }
+    }
+}
+
+function displayScore() {
+    message.textContent = `The score is:\nPlayer[${playerScore}]\nComputer[${computerScore}]`;
+}
+
+function newRound() {
+    toggleButtonVisibility();
+    greeting.textContent = "Next Round...";
+    continueCounter = -1; //Passing through the rest of eventListener will increase to 0
+    continueButton.classList.add('hidden');
+}
+
+function gameEnd() {
+    if (playerScore == 1) {
+        greeting.textContent = "YOU WIN!"
+        //continueButton.classList.add('hidden');
+        continueButton.textContent = "Play Again?";
+        continueCounter = 3;
+        endOfGame = false;
+        readyForNewRound: false;
+    }
+    else if (computerScore == 1) {
+        greeting.textContent = "YOU LOSE!";
+        //continueButton.classList.add('hidden');
+        continueButton.textContent = "Play Again?";
+        continueCounter = 3;
+        endOfGame = false;
+        readyForNewRound: false;
+    }
+}
+
+function newGame() {
+    continueCounter = 0;
+    playerScore = 0;
+    computerScore = 0;
+    toggleButtonVisibility();
+    continueButton.classList.add('hidden');
+    newRound();
+}
+
+//HERE ARE THE NONGAME FUNCTIONS
+
+//THIS CREATES THE CLICK ANIMATION
+const buttonClick = document.querySelectorAll('button');
+buttonClick.forEach((button) => {
+    button.addEventListener('mousedown', () => {button.classList.add('click')});
+    button.addEventListener('mouseup', () => {button.classList.remove('click')});
+});
+
+//THIS MAKES THE GAME BUTTONS HIDDEN OR VISIBLE
+function toggleButtonVisibility() {
+    gameButtons.forEach((button) => {
+        if (button.classList.contains("hidden")) {
+            button.classList.remove("hidden");
+        }
+        else {
+            button.classList.add("hidden");
+        }
+    })
+}
+
+//THIS MAKES THE GAME START WITH THE "CONTINUE" BUTTON HIDDEN
+const continueButton = document.getElementById('4');
+continueButton.classList.add('hidden');
+
+//THIS FACILITATES THE PACE OF THE GAME WITH THE "CONTINUE" BUTTON
+continueButton.addEventListener('click', () => {
+    if (endOfGame == true) {gameEnd()};
+    if (playerScore == 1 || computerScore == 1) {
+        endOfGame = true;
+    }
+    if (continueCounter == 0) {roundResults()};//this adds player or computer score
+    if (continueCounter == 1) {displayScore()};//this displays user score, after setting endOfGame to TRUE
+    //this starts a new round
+    if (readyForNewRound = true) {newRound()};
+    //if (continueCounter == 3) {};
+    //this resets the game
+    if (continueCounter == 4) {newGame()};
+    //first set game to TRUE, then on next click perform gameEnd function
+    continueCounter += 1;
+});
+
+//THIS STARTS THE ROUND WHEN PLAYER SELECTS AN "ROCK PAPER SCISSORS" OPTION
+const startGame = document.querySelectorAll('button.game');
+startGame.forEach((button) => {
+    button.addEventListener('click', playerSelect);
+});
+//THIS PUSHES THE PLAYER SELECTION INTO THEPLAYERSELECT FUNCTION
+function playerSelect(e) {
+    if (this.id == "1") {playerSelection = "rock"};
+    if (this.id == "2") {playerSelection = "paper"};
+    if (this.id == "3") {playerSelection = "scissors"};
+    playRound(playerSelection);
+}
+
+//HERE ARE ALL THE GLOBAL VARIABLES
+let playerScore = 0;
+let computerScore = 0;
+let playerSelection = '';
+let continueCounter = 0;
+let endOfGame = false;
+let readyForNewRound = false;
+let gameButtons = document.querySelectorAll('button.game');
+let greeting = document.querySelector('div.greeting');
+let message = document.querySelector(".greeting");
+let computerSelection;
+
+</script>
+</body>
+</html>
