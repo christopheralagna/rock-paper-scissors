@@ -5,9 +5,163 @@
   <meta charset="UTF-8"/>
 </head>
 <body>
+
+<div class = "selectButtons">
+    <!--three <button class = "selectButton" id = number> are put here later by DOM methods-->
+</div>
+
+<div class = "infoBar">
+    <div class = "infoText"></div>
+</div>
+
+<div class = "continueButtons">
+    <!--<button class = "continueButton"> is put here later by DOM methods-->
+</div>
+
+<style>
+
+    body {
+        font-size: larger;
+        font-family: cursive;
+        background-color: #CCC;
+    }
+
+    button.click {
+        border: 5px solid red;
+        box-shadow: inset 5px 0px 5px #888;
+    }
+
+    .selectButtons {
+        display: flex;
+        justify-content: space-around;
+        margin-top: 10vh;
+        height: 250px;
+        min-width: 45em;
+    }
+
+    .selectButton {
+        width: 250px;
+        margin: 0 30px;
+        height: 170px;
+        box-shadow: 5px 5px 5px #888;
+        border-style: hidden;
+        transition: 0.1s;
+        font-family: fantasy;
+        font-size: larger;
+    }
+
+    .infoBar {
+        background-color: red;
+        position: relative;
+        text-align: center;
+        margin-top: 10vh;
+        padding: 20px 0px;
+        min-width: 45em;
+    }
+
+    .continueButtons {
+        margin: 0 auto;
+        min-width: 45em;
+    }
+
+    .continueButton {
+        display: block;
+        box-shadow: 5px 5px 5px #888;
+        border-style: hidden;
+        font-family: fantasy;
+        height: 2.5em;
+        width: 10em;
+        margin: 10vh auto;
+    }
+
+</style>
+
 <script>
 
-let computerPlay = function() {
+//HERE ARE ALL THE GLOBAL VARIABLES
+let playerScore = 0;
+let computerScore = 0;
+let playerSelection;
+let computerSelection;
+let continueStage;
+let endOfGame = false;
+let isWinner;
+//HERE ARE DOM ELEMENTS DECLARED GLOBALLY
+let infoText;
+let selectButtons;
+let selectButton;
+let continueButtons;
+let continueButton;
+//CHANGE THIS TO NUMBER OF POINTS TO WIN
+let winningScore = 5;
+
+//responsive click animation
+function buttonClick() {
+const buttonClick = document.querySelectorAll('button');
+buttonClick.forEach((button) => {
+    button.addEventListener('mousedown', () => {button.classList.add('click')});
+    button.addEventListener('mouseup', () => {button.classList.remove('click')});
+    });
+};
+
+//GAME FUNCTIONS
+function newRound() {
+    infoText = document.querySelector('.infoText');
+    infoText.textContent = ("Rock, Paper, Scissors: SHOOT!");
+    selectButtons = document.querySelector('.selectButtons');
+    for (i = 1; i <= 3; i++) {
+        selectButton = document.createElement('button');
+        selectButton.classList.add('selectButton');
+        selectButton.setAttribute('id', i.toString());
+        switch(i){
+            case 1:
+            selectButton.textContent = "Rock";
+            break;
+            case 2:
+            selectButton.textContent = "Paper";
+            break;
+            case 3:
+            selectButton.textContent = "Scissors";
+        }
+        selectButtons.appendChild(selectButton);
+    }
+    if (document.querySelector('button.continueButton')) {
+        continueButtons = document.querySelector('.continueButtons');
+        continueButton = document.querySelector('.continueButton');
+        continueButtons.removeChild(continueButton);
+    }
+    selectButtons = document.querySelectorAll('.selectButton');
+    selectButtons.forEach(button => 
+        button.addEventListener('click', checkSelection))
+    //checks for new available buttons for which to add the click animation
+    buttonClick();
+}
+
+let checkSelection = function() {
+    if (this.id == "1") {playerSelection = "rock"};
+    if (this.id == "2") {playerSelection = "paper"};
+    if (this.id == "3") {playerSelection = "scissors"};
+    displaySelections();
+}
+
+function displaySelections() {
+    selectButtons.forEach(button => 
+        button.removeEventListener('click', checkSelection));
+    computerSelection = computerSelect();
+    selectButtons = document.querySelectorAll('.selectButton');
+    selectButtons.forEach(button => button.remove())
+    infoText.textContent = `You played ${playerSelection}. The computer played ${computerSelection}.`;
+    continueButtons = document.querySelector('.continueButtons');
+    continueButton = document.createElement('button');
+    continueButton.classList.add('continueButton');
+    continueButton.textContent = 'continue';
+    continueButtons.appendChild(continueButton);
+    continueButton.addEventListener('click', continueClicker);
+    continueStage = 1;
+    buttonClick();
+}
+
+function computerSelect() {
     randomNumber = Math.floor(Math.random() * 3);
     switch (randomNumber) {
         case 0:
@@ -18,85 +172,113 @@ let computerPlay = function() {
         break;
         case 2:
         return "scissors";
-        break;
     }
 }
 
-function playRound() {
-    playerSelection = prompt("Rock, Paper, Scissors: Shoot!");
-    playerSelection = playerSelection.toLowerCase();
-    while (playerSelection != "rock" && playerSelection != "paper" && playerSelection != "scissors") {
-        if (playerSelection.length == 0) {
-            alert("You gotta type SOMETHING!")
-        } 
-        else {
-            alert("invalid response! Try again");
-        }
-        playerSelection = prompt("Rock, Paper, Scissors: Shoot!");
-        playerSelection = playerSelection.toLowerCase();
+function displayRoundWinner() {
+    const results = evaluateWinner();
+    switch (results) {
+        case 'winner':
+        infoText.textContent = `You win the Round! ${playerSelection} beats ${computerSelection}!`;
+        break;
+        case 'loser':
+        infoText.textContent = `You lose the Round! ${computerSelection} beats ${playerSelection}!`;
+        break;
+        case 'tied':
+        infoText.textContent = 'You Tied!';
     }
-    computerSelection = computerPlay();
-    alert(`You played ${playerSelection}. The computer played ${computerSelection}.`);
+    addScore(results);
+    continueStage = 2;
+}
+
+function evaluateWinner() { 
     if (playerSelection == "rock") {
         if (computerSelection == "scissors") {
-            alert("You Win the Round! Rock beats Scissors")
-            playerScore += 1;
+            return 'winner';
         }
         else if (computerSelection == "paper") {
-            alert("You Lose the Round! Paper beats Rock")
-            computerScore += 1;
+            return 'loser';
         }
         else {
-            alert("You Tied!")
+            return 'tied';
         }
     }
     else if (playerSelection == "paper") {
         if (computerSelection == "rock") {
-            alert("You Win the Round! Paper beats Rock")
-            playerScore += 1;
+            return 'winner';
         }
         else if (computerSelection == "scissors") {
-            alert("You Lose the Round! Scissors beats Paper")
-            computerScore +=1;
+            return 'loser';
         }
         else {
-            alert("You Tied!")
+            return 'tied';
         }
     }
     else if (playerSelection == "scissors") {
         if (computerSelection == "paper") {
-            alert("You Win the Round! Scissors beats Paper")
-            playerScore += 1;
+            return 'winner';
         }
         else if (computerSelection == "rock") {
-            alert("You Lose the Round! Rock beats Scissors")
-            computerScore += 1;
+            return 'loser';
         }
         else {
-            alert("You Tied!")
+            return 'tied';
         }
     }
-    alert(`The score is:\nPlayer[${playerScore}]\nComputer[${computerScore}]`);
 }
 
-function game() {
-    while(playerScore < 5 && computerScore < 5) {
-        playRound();
-    }
-    if (playerScore == 5) {
-        console.log(playerScore)
-        console.log(computerScore)
-        alert("You Win the Game! :)")
-    }
-    else {
-        alert("You Lose the Game! :(")
+function addScore(results) {
+    switch (results) {
+        case 'winner':
+        playerScore += 1;
+        break;
+        case 'loser':
+        computerScore += 1;
     }
 }
 
-let playerScore = 0;
-let computerScore = 0;
+function displayScore() {
+    infoText.textContent = `The score is:\nPlayer[${playerScore}]\nComputer[${computerScore}]`;
+    checkScores();
+    continueStage = 3;
+}
 
-console.log(game())
+function checkScores() {
+    if (playerScore == winningScore || computerScore == winningScore) {
+        endOfGame = true;
+    } else {
+        endOfGame = false;
+    }
+}
+
+//THIS CONTROLS THE PACE OF THE GAME
+function continueClicker() {
+    //in reverse order to avoid iterating through all at once
+    if (continueStage == 3) {
+        checkGameStatus();
+    }
+    if (continueStage == 2) {displayScore()};
+    if (continueStage == 1) {displayRoundWinner()};
+}
+
+function checkGameStatus() {
+    if (endOfGame) {
+        if (playerScore == winningScore) {isWinner = true}
+        else {isWinner = false};
+        displayGameWinner();
+    }
+    else {newRound()};
+}
+
+function displayGameWinner() {
+    isWinner ? infoText.textContent = 'YOU WIN!' : infoText.textContent = 'YOU LOSE!';
+    continueButton.textContent = 'Play again?';
+    playerScore = 0;
+    computerScore = 0;
+    endOfGame = false;
+}
+
+newRound();
 
 </script>
 </body>

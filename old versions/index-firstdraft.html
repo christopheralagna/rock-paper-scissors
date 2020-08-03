@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Page Title</title>
+  <meta charset="UTF-8"/>
+</head>
+<body>
+<script>
+
+let computerPlay = function() {
+    randomNumber = Math.floor(Math.random() * 3);
+    switch (randomNumber) {
+        case 0:
+        return "rock";
+        break;
+        case 1:
+        return "paper";
+        break;
+        case 2:
+        return "scissors";
+        break;
+    }
+}
+
+function playRound() {
+    playerSelection = prompt("Rock, Paper, Scissors: Shoot!");
+    playerSelection = playerSelection.toLowerCase();
+    while (playerSelection != "rock" && playerSelection != "paper" && playerSelection != "scissors") {
+        if (playerSelection.length == 0) {
+            alert("You gotta type SOMETHING!")
+        } 
+        else {
+            alert("invalid response! Try again");
+        }
+        playerSelection = prompt("Rock, Paper, Scissors: Shoot!");
+        playerSelection = playerSelection.toLowerCase();
+    }
+    computerSelection = computerPlay();
+    alert(`You played ${playerSelection}. The computer played ${computerSelection}.`);
+    if (playerSelection == "rock") {
+        if (computerSelection == "scissors") {
+            alert("You Win the Round! Rock beats Scissors")
+            playerScore += 1;
+        }
+        else if (computerSelection == "paper") {
+            alert("You Lose the Round! Paper beats Rock")
+            computerScore += 1;
+        }
+        else {
+            alert("You Tied!")
+        }
+    }
+    else if (playerSelection == "paper") {
+        if (computerSelection == "rock") {
+            alert("You Win the Round! Paper beats Rock")
+            playerScore += 1;
+        }
+        else if (computerSelection == "scissors") {
+            alert("You Lose the Round! Scissors beats Paper")
+            computerScore +=1;
+        }
+        else {
+            alert("You Tied!")
+        }
+    }
+    else if (playerSelection == "scissors") {
+        if (computerSelection == "paper") {
+            alert("You Win the Round! Scissors beats Paper")
+            playerScore += 1;
+        }
+        else if (computerSelection == "rock") {
+            alert("You Lose the Round! Rock beats Scissors")
+            computerScore += 1;
+        }
+        else {
+            alert("You Tied!")
+        }
+    }
+    alert(`The score is:\nPlayer[${playerScore}]\nComputer[${computerScore}]`);
+}
+
+function game() {
+    while(playerScore < 5 && computerScore < 5) {
+        playRound();
+    }
+    if (playerScore == 5) {
+        console.log(playerScore)
+        console.log(computerScore)
+        alert("You Win the Game! :)")
+    }
+    else {
+        alert("You Lose the Game! :(")
+    }
+}
+
+let playerScore = 0;
+let computerScore = 0;
+
+console.log(game())
+
+</script>
+</body>
+</html>
